@@ -1370,8 +1370,8 @@ namespace MonoDevelop.Ide
 					prepareExecution = ((IRunTarget)buildTarget).PrepareExecution (new ProgressMonitor ().WithCancellationSource (cs), context, configuration, runConfiguration);
 				else
 					prepareExecution = buildTarget.PrepareExecution (new ProgressMonitor ().WithCancellationSource (cs), context, configuration);
-				
-				var result = await Build (buildTarget, true).Task;
+
+				var result = await Build (buildTarget, true, checkNeedsBuild: true).Task;
 
 				if (result.HasErrors || (!IdeApp.Preferences.RunWithWarnings && result.HasWarnings)) {
 					cs.Cancel ();
@@ -1481,7 +1481,7 @@ namespace MonoDevelop.Ide
 			return Build (entry, false, cancellationToken, operationContext);
 		}
 
-		AsyncOperation<BuildResult> Build (IBuildTarget entry, bool skipPrebuildCheck, CancellationToken? cancellationToken = null, OperationContext operationContext = null)
+		AsyncOperation<BuildResult> Build (IBuildTarget entry, bool skipPrebuildCheck, CancellationToken? cancellationToken = null, OperationContext operationContext = null, bool checkNeedsBuild = false)
 		{
 			if (currentBuildOperation != null && !currentBuildOperation.IsCompleted) return currentBuildOperation;
 
@@ -1492,7 +1492,7 @@ namespace MonoDevelop.Ide
 					cs = CancellationTokenSource.CreateLinkedTokenSource (cs.Token, cancellationToken.Value);
 				ProgressMonitor monitor = IdeApp.Workbench.ProgressMonitors.GetBuildProgressMonitor ().WithCancellationSource (cs);
 				BeginBuild (monitor, tt, false);
-				var t = BuildSolutionItemAsync (entry, monitor, tt, skipPrebuildCheck, operationContext);
+				var t = BuildSolutionItemAsync (entry, monitor, tt, skipPrebuildCheck, operationContext, checkNeedsBuild);
 				currentBuildOperation = new AsyncOperation<BuildResult> (t, cs);
 				currentBuildOperationOwner = entry;
 				t.ContinueWith ((ta) => currentBuildOperationOwner = null);
@@ -1503,7 +1503,7 @@ namespace MonoDevelop.Ide
 			return currentBuildOperation;
 		}
 		
-		async Task<BuildResult> BuildSolutionItemAsync (IBuildTarget entry, ProgressMonitor monitor, ITimeTracker tt, bool skipPrebuildCheck = false, OperationContext operationContext = null)
+		async Task<BuildResult> BuildSolutionItemAsync (IBuildTarget entry, ProgressMonitor monitor, ITimeTracker tt, bool skipPrebuildCheck = false, OperationContext operationContext = null, bool checkNeedsBuild = false)
 		{
 			BuildResult result = null;
 			try {
@@ -1517,7 +1517,7 @@ namespace MonoDevelop.Ide
 
 				if (skipPrebuildCheck || result.ErrorCount == 0) {
 					tt.Trace ("Building item");
-					result = await entry.Build (monitor, IdeApp.Workspace.ActiveConfiguration, true, operationContext);
+					result = await entry.Build (monitor, IdeApp.Workspace.ActiveConfiguration, true, operationContext, checkNeedsBuild);
 				}
 			} catch (Exception ex) {
 				monitor.ReportError (GettextCatalog.GetString ("Build failed."), ex);

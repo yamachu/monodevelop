@@ -257,12 +257,12 @@ namespace MonoDevelop.Ide
 			monitor.EndTask ();
 		}
 		
-		async Task<BuildResult> IBuildTarget.Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferences, OperationContext operationContext)
+		async Task<BuildResult> IBuildTarget.Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferences, OperationContext operationContext, bool checkNeedsBuild)
 		{
 			BuildResult result = null;
 			var items = Items.OfType<IBuildTarget> ().ToList ();
 			foreach (var it in items) {
-				BuildResult res = await it.Build (monitor, configuration, buildReferences, operationContext);
+				BuildResult res = await it.Build (monitor, configuration, buildReferences, operationContext, checkNeedsBuild);
 				if (res != null) {
 					if (result == null)
 						result = new BuildResult ();

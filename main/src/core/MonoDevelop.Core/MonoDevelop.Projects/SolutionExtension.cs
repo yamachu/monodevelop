@@ -51,9 +51,9 @@ namespace MonoDevelop.Projects
 			return item is Solution;
 		}
 
-		internal protected virtual Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)
+		internal protected virtual Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext, bool checkNeedsBuild)
 		{
-			return next.Build (monitor, configuration, operationContext);
+			return next.Build (monitor, configuration, operationContext, checkNeedsBuild);
 		}
 
 		internal protected virtual Task<BuildResult> Clean (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)

@@ -657,17 +657,17 @@ namespace MonoDevelop.Projects
 
 		public Task<BuildResult> Build (ProgressMonitor monitor, string configuration, OperationContext operationContext = null)
 		{
-			return SolutionExtension.Build (monitor, (SolutionConfigurationSelector) configuration, operationContext);
+			return SolutionExtension.Build (monitor, (SolutionConfigurationSelector)configuration, operationContext, false);
 		}
 
-		Task<BuildResult> IBuildTarget.Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets, OperationContext operationContext)
+		Task<BuildResult> IBuildTarget.Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets, OperationContext operationContext, bool checkNeedsBuild)
 		{
-			return Build (monitor, configuration, operationContext);
+			return Build (monitor, configuration, operationContext, checkNeedsBuild);
 		}
 
-		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext = null)
+		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext = null, bool checkNeedsBuild = false)
 		{
-			return SolutionExtension.Build (monitor, configuration, operationContext);
+			return SolutionExtension.Build (monitor, configuration, operationContext, checkNeedsBuild);
 		}
 
 		public bool NeedsBuilding (ConfigurationSelector configuration)
@@ -802,9 +802,9 @@ namespace MonoDevelop.Projects
 		}
 
 		/*protected virtual*/
-		Task<BuildResult> OnBuild (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)
+		Task<BuildResult> OnBuild (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext, bool checkNeedsBuild)
 		{
-			return RootFolder.Build (monitor, configuration, operationContext:operationContext);
+			return RootFolder.Build (monitor, configuration, operationContext:operationContext, checkNeedsBuild: checkNeedsBuild);
 		}
 
 		/*protected virtual*/ bool OnGetNeedsBuilding (ConfigurationSelector configuration)
@@ -1225,9 +1225,9 @@ namespace MonoDevelop.Projects
 				return Solution.OnGetItemFiles (includeReferencedFiles);
 			}
 
-			internal protected override Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)
+			internal protected override Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext, bool checkNeedsBuild)
 			{
-				return Solution.OnBuild (monitor, configuration, operationContext);
+				return Solution.OnBuild (monitor, configuration, operationContext, checkNeedsBuild);
 			}
 
 			internal protected override bool NeedsBuilding (ConfigurationSelector configuration)

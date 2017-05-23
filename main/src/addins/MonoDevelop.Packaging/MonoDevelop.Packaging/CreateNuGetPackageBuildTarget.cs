@@ -52,7 +52,7 @@ namespace MonoDevelop.Packaging
 		/// 
 		/// Otherwise the Pack target is called.
 		/// </summary>
-		public async Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets = false, OperationContext operationContext = null)
+		public async Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets = false, OperationContext operationContext = null, bool checkNeedsBuild = false)
 		{
 			if (project is PackagingProject) {
 				return await project.Build (monitor, configuration, buildReferencedTargets, new TargetEvaluationContext (operationContext));
@@ -67,7 +67,7 @@ namespace MonoDevelop.Packaging
 
 			// Build the project and any dependencies first.
 			if (buildReferencedTargets && project.GetReferencedItems (configuration).Any ()) {
-				result = await project.Build (monitor, configuration, buildReferencedTargets, operationContext);
+				result = await project.Build (monitor, configuration, buildReferencedTargets, operationContext, false);
 				if (result.Failed)
 					return result;
 			}

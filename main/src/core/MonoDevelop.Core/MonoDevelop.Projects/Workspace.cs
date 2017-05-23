@@ -79,12 +79,12 @@ namespace MonoDevelop.Projects
 		}
 
 		[ThreadSafe]
-		public async Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets = false, OperationContext operationContext = null)
+		public async Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets = false, OperationContext operationContext = null, bool checkNeedsBuild = false)
 		{
 			AssertMainThread ();
 			var res = new BuildResult { BuildCount = 0 };
 			foreach (var bt in Items.OfType<IBuildTarget> ())
-				res.Append (await bt.Build (monitor, configuration, operationContext:operationContext));
+				res.Append (await bt.Build (monitor, configuration, operationContext:operationContext, checkNeedsBuild: checkNeedsBuild));
 			return res;
 		}
 

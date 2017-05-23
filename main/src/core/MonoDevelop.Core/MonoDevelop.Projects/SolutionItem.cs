@@ -568,15 +568,15 @@ namespace MonoDevelop.Projects
 		/// </param>
 		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, bool buildReferences)
 		{
-			return BindTask (ct => BuildTask (monitor.WithCancellationToken (ct), solutionConfiguration, buildReferences, new OperationContext ()));
+			return BindTask (ct => BuildTask (monitor.WithCancellationToken (ct), solutionConfiguration, buildReferences, new OperationContext (), false));
 		}
 
-		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, bool buildReferences, OperationContext operationContext)
+		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, bool buildReferences, OperationContext operationContext, bool checkNeedsBuild)
 		{
-			return BindTask (ct => BuildTask (monitor.WithCancellationToken (ct), solutionConfiguration, buildReferences, operationContext));
+			return BindTask (ct => BuildTask (monitor.WithCancellationToken (ct), solutionConfiguration, buildReferences, operationContext, checkNeedsBuild));
 		}
 
-		async Task<BuildResult> BuildTask (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, bool buildReferences, OperationContext operationContext)
+		async Task<BuildResult> BuildTask (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, bool buildReferences, OperationContext operationContext, bool checkNeedsBuild)
 		{
 			if (!buildReferences) {
 				try {
@@ -602,6 +602,9 @@ namespace MonoDevelop.Projects
 				var visited = new Set<SolutionItem> ();
 				GetBuildableReferencedItems (visited, referenced, this, solutionConfiguration);
 
+				if (checkNeedsBuild)
+					referenced = referenced.Where (r => r.OnGetNeedsBuilding (solutionConfiguration)).ToList ();
+
 				var sortedReferenced = TopologicalSort (referenced, solutionConfiguration);
 
 				SolutionItemConfiguration iconf = GetConfiguration (solutionConfiguration);
@@ -609,7 +612,7 @@ namespace MonoDevelop.Projects
 				monitor.BeginTask (GettextCatalog.GetString ("Building: {0} ({1})", Name, confName), sortedReferenced.Count);
 
 				return await SolutionFolder.RunParallelBuildOperation (monitor, solutionConfiguration, sortedReferenced, (ProgressMonitor m, SolutionItem item) => {
-					return item.Build (m, solutionConfiguration, false, operationContext);
+					return item.Build (m, solutionConfiguration, false, operationContext, checkNeedsBuild);
 				}, false);
 			} finally {
 				monitor.EndTask ();

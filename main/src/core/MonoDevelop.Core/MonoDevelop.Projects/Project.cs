@@ -1779,7 +1779,7 @@ namespace MonoDevelop.Projects
 		/// <param name="operationContext">Context information.</param>
 		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, ProjectOperationContext operationContext)
 		{
-			return base.Build (monitor, solutionConfiguration, false, operationContext);
+			return base.Build (monitor, solutionConfiguration, false, operationContext, false);
 		}
 
 		/// <summary>
@@ -1791,7 +1791,7 @@ namespace MonoDevelop.Projects
 		/// <param name="operationContext">Context information.</param>
 		public Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector solutionConfiguration, bool buildReferences, ProjectOperationContext operationContext)
 		{
-			return base.Build (monitor, solutionConfiguration, buildReferences, operationContext);
+			return base.Build (monitor, solutionConfiguration, buildReferences, operationContext, false);
 		}
 
 		/// <summary>

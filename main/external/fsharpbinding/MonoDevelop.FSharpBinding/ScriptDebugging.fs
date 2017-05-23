@@ -51,7 +51,7 @@ type ScriptBuildTarget(scriptPath, consoleKind, source) =
 
     static let emptyTask = Task.FromResult None :> Task
     interface IBuildTarget with
-        member x.Build(monitor, _config, _buildReferencedTargets, _operationContext) =
+        member x.Build(monitor, _config, _buildReferencedTargets, _operationContext, _checkNeedsBuild) =
             async {
                 if not (Directory.Exists tempPath) then
                     Directory.CreateDirectory tempPath |> ignore

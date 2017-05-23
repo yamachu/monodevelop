@@ -40,7 +40,7 @@ namespace MonoDevelop.Projects
 		/// <param name="monitor">Monitor for tracking progress</param>
 		/// <param name="configuration">Configuration to build</param>
 		/// <param name="buildReferencedTargets">If set to <c>true</c> build referenced targets before building this one</param>
-		Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets = false, OperationContext operationContext = null);
+		Task<BuildResult> Build (ProgressMonitor monitor, ConfigurationSelector configuration, bool buildReferencedTargets = false, OperationContext operationContext = null, bool checkNeedsBuild = false);
 
 		/// <summary>
 		/// Cleans the targets
