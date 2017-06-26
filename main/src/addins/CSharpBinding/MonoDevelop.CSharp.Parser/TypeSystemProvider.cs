@@ -42,7 +42,8 @@ namespace MonoDevelop.CSharp.Parser
 		{
 			var fileName = options.FileName;
 			var project = options.Project;
-			var result = new CSharpParsedDocument (fileName);
+			var doc = options.RoslynDocument;
+			var result = new CSharpParsedDocument (fileName, doc);
 
 			if (project != null) {
 				
@@ -69,6 +70,7 @@ namespace MonoDevelop.CSharp.Parser
 						var model = await curDoc.GetSemanticModelAsync (cancellationToken).ConfigureAwait (false);
 						unit = model.SyntaxTree;
 						result.Ast = model;
+						result.Doc = curDoc;
 					} catch (AggregateException ae) {
 						ae.Flatten ().Handle (x => x is OperationCanceledException); 
 						return result;

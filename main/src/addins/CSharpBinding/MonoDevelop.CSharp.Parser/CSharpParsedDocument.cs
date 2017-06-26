@@ -27,12 +27,16 @@ using System;
 using MonoDevelop.Ide.TypeSystem;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel.Composition;
 using System.Linq;
 using MonoDevelop.Ide.Editor;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.TodoComments;
+using Microsoft.CodeAnalysis.Editor;
 using MonoDevelop.Core;
 using MonoDevelop.Core.Text;
 
@@ -40,11 +44,15 @@ namespace MonoDevelop.CSharp.Parser
 {
 	class CSharpParsedDocument : ParsedDocument
 	{
-		static string[] tagComments;
+		static ImmutableArray<TodoCommentDescriptor> tagComments;
 
 		internal SyntaxTree Unit {
 			get;
 			set;
+		}
+
+		internal Document Doc {
+			get; set;
 		}
 
 		static CSharpParsedDocument ()
@@ -57,8 +65,11 @@ namespace MonoDevelop.CSharp.Parser
 
 		static void UpdateTags ()
 		{
-			tagComments = MonoDevelop.Ide.Tasks.CommentTag.SpecialCommentTags.Select (t => t.Tag).ToArray ();
+			tagComments = MonoDevelop.Ide.Tasks.CommentTag.SpecialCommentTags.Select (t => new TodoCommentDescriptor (t.Tag, t.Priority)).ToImmutableArray ();
 		}
+
+		[Import]
+		ITodoListProvider todoProvider;
 
 		public CSharpParsedDocument (string fileName) : base (fileName)
 		{
@@ -253,11 +264,7 @@ namespace MonoDevelop.CSharp.Parser
 			public List<Tag> Tags =  new List<Tag> ();
 			CancellationToken cancellationToken;
 
-			public SemanticTagVisitor () : base (SyntaxWalkerDepth.Trivia)
-			{
-			}
-
-			public SemanticTagVisitor (CancellationToken cancellationToken) : base (SyntaxWalkerDepth.Trivia)
+			public SemanticTagVisitor (CancellationToken cancellationToken) : base (SyntaxWalkerDepth.Node)
 			{
 				this.cancellationToken = cancellationToken;
 			}
@@ -266,23 +273,6 @@ namespace MonoDevelop.CSharp.Parser
 			{
 				cancellationToken.ThrowIfCancellationRequested ();
 				base.VisitBlock (node);
-			}
-
-			public override void VisitTrivia (SyntaxTrivia trivia)
-			{
-				cancellationToken.ThrowIfCancellationRequested ();
-				if (trivia.IsKind (SyntaxKind.SingleLineCommentTrivia) || 
-					trivia.IsKind (SyntaxKind.MultiLineCommentTrivia) || 
-					trivia.IsKind (SyntaxKind.SingleLineDocumentationCommentTrivia)) {
-					var trimmedContent = trivia.ToString ().TrimStart ('/', ' ', '*');
-					foreach (string tag in tagComments) {
-						if (!trimmedContent.StartsWith (tag, StringComparison.Ordinal))
-							continue;
-						var loc = trivia.GetLocation ().GetLineSpan ();
-						Tags.Add (new Tag (tag, trimmedContent, new DocumentRegion (loc.StartLinePosition, loc.EndLinePosition)));
-						break;
-					}
-				}
 			}
 
 			public override void VisitThrowStatement (Microsoft.CodeAnalysis.CSharp.Syntax.ThrowStatementSyntax node)
