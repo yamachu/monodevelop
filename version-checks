@@ -17,8 +17,8 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=fe9aa26efed220fa22cd789f8e18ec029c723bed
-DEP_BRANCH_AND_REMOTE[0]="master origin/master"
+DEP_NEEDED_VERSION[0]=7c4deb32d618246b186804ad71445473b431741e
+DEP_BRANCH_AND_REMOTE[0]="android-resource-designer-3 origin/android-resource-designer-3"
 
 # heap-shot
 DEP[1]=heap-shot
