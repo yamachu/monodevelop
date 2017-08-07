@@ -286,6 +286,10 @@ namespace MonoDevelop.Components.AutoTest.Results
 			}
 
 			IEnumerable<IConfigurationModel> model = (IEnumerable<IConfigurationModel>)pinfo.GetValue (ResultObject, null);
+			foreach (var configModel in model)
+			{
+				LoggingService.LogInfo ($"Config Model: {configModel.DisplayString} | Id: {configModel.OriginalId}");
+			}
 			var configuration = model.FirstOrDefault (c => c.DisplayString == configurationName);
 			if (configuration == null) {
 				return false;
@@ -309,7 +313,13 @@ namespace MonoDevelop.Components.AutoTest.Results
 			}
 
 			IEnumerable<IRuntimeModel> model = (IEnumerable<IRuntimeModel>)pinfo.GetValue (ResultObject, null);
-
+			foreach (var runtimeModel in model) {
+				LoggingService.LogInfo ($"Config Model: {runtimeModel.GetMutableModel ().FullDisplayString} | Count: {runtimeModel.Children.Count ()}");
+				foreach (var childRunTime in runtimeModel.Children)
+				{
+					LoggingService.LogInfo ($"\tChild Config Model: {childRunTime.GetMutableModel ().FullDisplayString}");
+				}
+			}
 			var runtime = model.FirstOrDefault (r => r.GetMutableModel ().FullDisplayString == runtimeName);
 			if (runtime == null) {
 				return false;
