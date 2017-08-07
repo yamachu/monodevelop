@@ -288,18 +288,24 @@ namespace MonoDevelop.Components.AutoTest.Results
 			IEnumerable<IConfigurationModel> model = (IEnumerable<IConfigurationModel>)pinfo.GetValue (ResultObject, null);
 			foreach (var configModel in model)
 			{
-				LoggingService.LogInfo ($"Config Model: {configModel.DisplayString} | Id: {configModel.OriginalId}");
+				LoggingService.LogInfo ($"Config Model: '{configModel.DisplayString}' | Id: '{configModel.OriginalId}'");
 			}
+			LoggingService.LogInfo ($"Looking for configuration: '{configurationName}'");
 			var configuration = model.FirstOrDefault (c => c.DisplayString == configurationName);
 			if (configuration == null) {
+				LoggingService.LogInfo ($"Did not find any matching configuration");
 				return false;
 			}
 
+			LoggingService.LogInfo ($"Found a matching configuration: '{configuration.DisplayString}' for '{configurationName}'");
+			LoggingService.LogInfo ($"Trying to fetch Property 'ActiveConfiguration'");
 			pinfo = type.GetProperty ("ActiveConfiguration");
 			if (pinfo == null) {
+				LoggingService.LogInfo ($"Property 'ActiveConfiguration' not found");
 				return false;
 			}
 
+			LoggingService.LogInfo ($"Setting 'ActiveConfiguration' as '{configuration.DisplayString}'");
 			pinfo.SetValue (ResultObject, configuration);
 			return true;
 		}
@@ -320,16 +326,22 @@ namespace MonoDevelop.Components.AutoTest.Results
 					LoggingService.LogInfo ($"\tChild Config Model: {childRunTime.GetMutableModel ().FullDisplayString}");
 				}
 			}
+			LoggingService.LogInfo ($"Looking for Runtime: '{runtimeName}'");
 			var runtime = model.FirstOrDefault (r => r.GetMutableModel ().FullDisplayString == runtimeName);
 			if (runtime == null) {
+				LoggingService.LogInfo ($"Did not find any matching runtime");
 				return false;
 			}
 
+			LoggingService.LogInfo ($"Found a matching runtime: '{runtime.GetMutableModel ().FullDisplayString}' for '{runtimeName}'");
+			LoggingService.LogInfo ($"Trying to fetch Property 'ActiveRuntime'");
 			pinfo = type.GetProperty ("ActiveRuntime");
 			if (pinfo == null) {
+				LoggingService.LogInfo ($"Property 'ActiveRuntime' not found");
 				return false;
 			}
 
+			LoggingService.LogInfo ($"Setting 'ActiveRuntime' as '{runtimeName}'");
 			pinfo.SetValue (ResultObject, runtime);
 			return true;
 		}
