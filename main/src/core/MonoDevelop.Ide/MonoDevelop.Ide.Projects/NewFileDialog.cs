@@ -177,8 +177,6 @@ namespace MonoDevelop.Ide.Projects
 			}
 		}
 
-
-
 		void InitializeDialog (bool update)
 		{
 			if (update) {
