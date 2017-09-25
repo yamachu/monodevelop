@@ -1,9 +1,10 @@
-﻿// MdsTests.cs
+﻿//
+// NetStandardProjectTests.cs
 //
 // Author:
-//   Lluis Sanchez Gual <lluis@novell.com>
+//       Lluis Sanchez <llsan@microsoft.com>
 //
-// Copyright (c) 2008 Novell, Inc (http://www.novell.com)
+// Copyright (c) 2017 Microsoft
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,43 +23,35 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//
-//
 
+using System;
 using System.IO;
+using System.Xml;
 using NUnit.Framework;
 using UnitTests;
+using MonoDevelop.Core;
+using System.Linq;
+using MonoDevelop.Projects.MSBuild;
 using System.Threading.Tasks;
+using MonoDevelop.Core.Serialization;
+using MonoDevelop.Projects.Extensions;
 
 namespace MonoDevelop.Projects
 {
 	[TestFixture]
-	public class MdsTests: TestBase
+	public class NetStandardProjectTests: TestBase
 	{
 		[Test]
-		public async Task TestSaveWorkspace ()
+		public async Task NetStandardProjectReferenceIncludesFacades ()
 		{
-			// Saving a workspace must save all solutions and projects it contains
-			
-			string dir = Util.CreateTmpDir ("TestSaveWorkspace");
-			Workspace ws = new Workspace ();
-			ws.FileName = Path.Combine (dir, "workspace");
-			
-			Solution sol = new Solution ();
-			sol.FileName = Path.Combine (dir, "thesolution");
-			ws.Items.Add (sol);
-			
-			DotNetProject p = Services.ProjectService.CreateDotNetProject ("C#");
-			p.FileName = Path.Combine (dir, "theproject");
-			sol.RootFolder.Items.Add (p);
-			
-			await ws.SaveAsync (Util.GetMonitor ());
-			
-			Assert.IsTrue (File.Exists (ws.FileName));
-			Assert.IsTrue (File.Exists (sol.FileName));
-			Assert.IsTrue (File.Exists (p.FileName));
+			// Test for https://bugzilla.xamarin.com/show_bug.cgi?id=55734
 
-			ws.Dispose ();
+			string solFile = Util.GetSampleProject ("netstandard-project", "NetStandardTest.sln");
+			var sol = (Solution)await Services.ProjectService.ReadWorkspaceItem (Util.GetMonitor (), solFile);
+
+			var p = (DotNetProject)sol.Items [0];
+			var asms = await p.GetReferencedAssemblies (p.Configurations [0].Selector);
+			Assert.IsTrue (asms.Any (r => r.FilePath.FileName == "System.Runtime.dll"));
 		}
 	}
 }
