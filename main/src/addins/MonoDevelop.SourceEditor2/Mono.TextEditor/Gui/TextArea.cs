@@ -1331,6 +1331,23 @@ namespace Mono.TextEditor
 				double x = (int) e.XRoot - rx;
 				double y = (int) e.YRoot - ry;
 
+				if (Platform.IsWindows) {
+					// TODO: revisit this when we move to a newer Gtk.
+					// https://bugzilla.xamarin.com/show_bug.cgi?id=57086
+					// There seems to be a bug in Gtk+ where for a 4K multi-monitor configuration
+					// on Windows the e.XRoot reported in EventMotion above is negative. Hence the
+					// logic of computing x and y above based on XRoot results in incorrect (negative)
+					// coordinates and hovering in the editor doesn't work (no tooltip showing, etc)
+					// The good news is that the original reported TextArea-relative coordinates
+					// are correct, so lets just use them. This fixes numerous bad symptoms:
+					//  1. tooltips and hovering doesn't work
+					//  2. selection with mouse doesn't properly work (selects from beginning of line)
+					//  3. mouse caret doesn't change to beam when over the editor area
+					//  4. possibly more
+					x = e.X;
+					y = e.Y;
+				}
+
 				overChildWidget = containerChildren.Any (w => w.Child.Allocation.Contains ((int)x, (int)y));
 
 				RemoveScrollWindowTimer ();
@@ -2845,8 +2862,14 @@ namespace Mono.TextEditor
 			             (int)mx,
 			             (int)my);
 		}
+
+		public void ShowQuickInfo ()
+		{
+			var p = LocationToPoint (Caret.Location);
+			ShowTooltip (Gdk.ModifierType.None, Caret.Offset, p.X, p.Y, 0);
+		}
 		
-		void ShowTooltip (Gdk.ModifierType modifierState, int offset, int xloc, int yloc)
+		void ShowTooltip (Gdk.ModifierType modifierState, int offset, int xloc, int yloc, uint timeOut = TooltipTimeout)
 		{
 			CancelScheduledShow ();
 			if (textEditorData.SuppressTooltips)
@@ -2867,10 +2890,9 @@ namespace Mono.TextEditor
 			nextTipOffset = offset;
 			nextTipModifierState = modifierState;
 			nextTipScheduledTime = DateTime.Now + TimeSpan.FromMilliseconds (TooltipTimeout);
-
 			// If a tooltip is already scheduled, there is no need to create a new timer.
 			if (tipShowTimeoutId == 0)
-				tipShowTimeoutId = GLib.Timeout.Add (TooltipTimeout, () => { TooltipTimer (); return false; });
+				tipShowTimeoutId = GLib.Timeout.Add (timeOut, () => { TooltipTimer (); return false; });
 		}
 		
 		async void TooltipTimer ()
@@ -2936,7 +2958,6 @@ namespace Mono.TextEditor
 					return;
 				
 				CancelScheduledShow ();
-
 				tipWindow = tw;
 				currentTooltipProvider = provider;
 				
