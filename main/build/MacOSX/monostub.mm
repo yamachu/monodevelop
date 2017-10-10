@@ -15,6 +15,9 @@
 #include "monostub-utils.h"
 
 #import <Foundation/Foundation.h>
+#if MERP
+#import "merpapi.h"
+#endif
 
 typedef int (* mono_main) (int argc, char **argv);
 typedef void (* mono_free) (void *ptr);
@@ -260,6 +263,9 @@ try_load_gobject_tracker (void *libmono, char *entry_executable)
 
 int main (int argc, char **argv)
 {
+#if MERP
+	MbuInitMerp(); 
+#endif
 	//clock_t start = clock();
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSString *binDir = [[NSString alloc] initWithUTF8String: "Contents/Resources/lib/monodevelop/bin"];
@@ -422,5 +428,10 @@ int main (int argc, char **argv)
 	//clock_t end = clock();
 	//printf("%f seconds to start\n", (float)(end - start) / CLOCKS_PER_SEC);
 
-	return _mono_main (argc + extra_argc + injected, new_argv);
+	int main_result;
+	main_result = _mono_main (argc + extra_argc + injected, new_argv);
+#if MERP
+	MbuTerminateMerp(); 
+#endif	
+	return main_result;
 }

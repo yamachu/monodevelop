@@ -45,6 +45,14 @@ clean-local:
 	rm -rf MonoDevelop.app
 	rm -f MonoDevelop*.dmg
 
+monostub-merp:
+	clang++ $(EXTERN_C_XM_REGISTRAR_DEFINE) $(MONOSTUB_DEFINES) -DMERP -Wall -mmacosx-version-min=10.10 -m$(MONOSTUB_ARCH) -o $@ monostub.mm -framework merp -F . -framework AppKit -framework Quartz $(MONOSTUB_STATIC_LINK) -undefined dynamic_lookup -rpath @executable_path/../Frameworks
+
+app-with-merp: monostub-merp app
+	@echo "Including Microsoft Error Reporting"
+	rm $(MACOS)/MonoDevelop
+	cp monostub-merp $(MACOS)/MonoDevelop
+
 app: monostub monostub-test
 	@echo ""
 	@echo "Creating directories in app bundle"

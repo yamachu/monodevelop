@@ -253,3 +253,5 @@ main/po/StripMnemonics.pdb
 main/po/StripMnemonics.exe
 *.binlog
 *.ProjectImports.zip
+/main/build/MacOSX/monostub-merp
+/main/build/MacOSX/merpapi.h
