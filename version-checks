@@ -17,7 +17,7 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=86722cafa44a5063f3f14ebadf60cc1b4f07563c
+DEP_NEEDED_VERSION[0]=aa644f4d5bad80dfe86266b088a813adf9633ab8
 DEP_BRANCH_AND_REMOTE[0]="incapsulate-login-logic origin/incapsulate-login-logic"
 
 # heap-shot
