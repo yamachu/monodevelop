@@ -17,7 +17,7 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=19153717db6d365ce20515409e22ab56b729f6a8
+DEP_NEEDED_VERSION[0]=d2f46759f7385a51f6cfa5b573414371c3b4a8df
 DEP_BRANCH_AND_REMOTE[0]="vramak/acr_sku_update origin/vramak/acr_sku_update"
 
 # heap-shot
