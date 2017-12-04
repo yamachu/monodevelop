@@ -43,6 +43,31 @@ module ServiceSettings =
 /// Provides default empty/negative results if information is missing.
 type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults : FSharpParseFileResults option) =
 
+    let entityCache = EntityCache()
+    let getAllSymbols (checkResults: FSharpCheckFileResults) =
+        let res =
+            //AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature
+            try
+              [
+                yield! AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature
+                let ctx = checkResults.ProjectContext
+                let assembliesByFileName =
+                  ctx.GetReferencedAssemblies()
+                  |> Seq.groupBy (fun asm -> asm.FileName)
+                  |> Seq.map (fun (fileName, asms) -> fileName, List.ofSeq asms)
+                  |> Seq.toList
+                  |> List.rev // if mscorlib.dll is the first then FSC raises exception when we try to
+                              // get Content.Entities from it.
+
+                for fileName, signatures in assembliesByFileName do
+                  let contentType = Public // it's always Public for now since we don't support InternalsVisibleTo attribute yet
+                  let content = AssemblyContentProvider.getAssemblyContent entityCache.Locking contentType fileName signatures
+                  yield! content
+              ]
+            with
+            | _ -> []
+        res
+
     /// Get declarations at the current location in the specified document and the long ident residue
     /// e.g. The incomplete ident One.Two.Th will return Th
     member x.GetDeclarations(line, col, lineStr) =
@@ -53,8 +78,9 @@ type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults
             // Get items & generate output
             try
                 let partialName = QuickParse.GetPartialLongNameEx(lineStr, col-1)
+
                 let results =
-                    Async.RunSynchronously(checkResults.GetDeclarationListInfo(parseResults, line, lineStr, partialName, fun () -> []), timeout = ServiceSettings.blockingTimeout )
+                    Async.RunSynchronously(checkResults.GetDeclarationListInfo(parseResults, line, lineStr, partialName, fun() -> getAllSymbols checkResults), timeout = ServiceSettings.blockingTimeout )
                 Some (results, residue)
             with :? TimeoutException -> None
         | None, _ -> None
@@ -67,9 +93,8 @@ type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults
             | Some checkResults, parseResults ->
                   // Get items & generate output
                   let partialName = QuickParse.GetPartialLongNameEx(lineStr, col-1)
-
                   try
-                      let! results = checkResults.GetDeclarationListSymbols(parseResults, line, lineStr, partialName)
+                      let! results = checkResults.GetDeclarationListSymbols(parseResults, line, lineStr, partialName, fun() -> getAllSymbols checkResults)
 
                       return Some (results, partialName.PartialIdent)
                   with :? TimeoutException -> return None
