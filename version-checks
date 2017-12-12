@@ -17,7 +17,7 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=cc99d257097bb5a9398255ad9b9bcb18fa2e8a87
+DEP_NEEDED_VERSION[0]=c64e6f96bfa471f2ffea569c5ab84dc344a102bc
 DEP_BRANCH_AND_REMOTE[0]="pr-sandy-inspector-split origin/pr-sandy-inspector-split"
 
 # heap-shot
