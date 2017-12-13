@@ -36,20 +36,22 @@ module ServiceSettings =
     let blockingTimeout = getEnvInteger "FSharpBinding_BlockingTimeout" 1000
     let maximumTimeout = getEnvInteger "FSharpBinding_MaxTimeout" 10000
     let idleBackgroundCheckTime = getEnvInteger "FSharpBinding_IdleBackgroundCheckTime" 2000
- 
+
+module entityCache = 
+    let cache = EntityCache()
 // --------------------------------------------------------------------------------------
 /// Wraps the result of type-checking and provides methods for implementing
 /// various IntelliSense functions (such as completion & tool tips).
 /// Provides default empty/negative results if information is missing.
 type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults : FSharpParseFileResults option) =
 
-    let entityCache = EntityCache()
     let getAllSymbols (checkResults: FSharpCheckFileResults) =
         let res =
             //AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature
+            LoggingService.logDebug "GetDeclarations: getAllSymbols"
             try
               [
-                yield! AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature
+                //yield! AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature
                 let ctx = checkResults.ProjectContext
                 let assembliesByFileName =
                   ctx.GetReferencedAssemblies()
@@ -60,8 +62,8 @@ type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults
                               // get Content.Entities from it.
 
                 for fileName, signatures in assembliesByFileName do
-                  let contentType = Public // it's always Public for now since we don't support InternalsVisibleTo attribute yet
-                  let content = AssemblyContentProvider.getAssemblyContent entityCache.Locking contentType fileName signatures
+                  let contentType = AssemblyContentType.Public
+                  let content = AssemblyContentProvider.getAssemblyContent entityCache.cache.Locking contentType fileName signatures
                   yield! content
               ]
             with
@@ -80,9 +82,11 @@ type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults
                 let partialName = QuickParse.GetPartialLongNameEx(lineStr, col-1)
 
                 let results =
-                    Async.RunSynchronously(checkResults.GetDeclarationListInfo(parseResults, line, lineStr, partialName, fun() -> getAllSymbols checkResults), timeout = ServiceSettings.blockingTimeout )
+                    Async.RunSynchronously(checkResults.GetDeclarationListInfo(parseResults, line, lineStr, partialName, fun() -> getAllSymbols checkResults), timeout = ServiceSettings.maximumTimeout)
                 Some (results, residue)
-            with :? TimeoutException -> None
+            with :? TimeoutException ->
+                LoggingService.logError "GetDeclarations - Time out: '%A', '%s'" longName residue 
+                None
         | None, _ -> None
 
     /// Get the symbols for declarations at the current location in the specified document and the long ident residue
@@ -95,7 +99,6 @@ type ParseAndCheckResults (infoOpt : FSharpCheckFileResults option, parseResults
                   let partialName = QuickParse.GetPartialLongNameEx(lineStr, col-1)
                   try
                       let! results = checkResults.GetDeclarationListSymbols(parseResults, line, lineStr, partialName, fun() -> getAllSymbols checkResults)
-
                       return Some (results, partialName.PartialIdent)
                   with :? TimeoutException -> return None
             | None, _ -> return None
