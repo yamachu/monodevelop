@@ -130,6 +130,7 @@ module Completion =
         column: int
         line: int
         ctrlSpace: bool
+        autoImport: bool
     }
 
     let (|InvalidToken|_|) context =
@@ -438,6 +439,7 @@ module Completion =
                     lineToCaret = lineToCaret
                     completionChar = completionChar
                     editor = editor
+                    autoImport = autoImport
                     } = context
 
                 let typedParseResults =
@@ -489,12 +491,15 @@ module Completion =
                     addIdentCompletions()
                 | Some tyRes ->
                     let opens =
-                        openStatements.getOpenStatements tyRes.ParseTree
-                        |> List.map fst
-                        |> Set.ofList
+                        match autoImport with
+                        | true ->
+                            openStatements.getOpenStatements tyRes.ParseTree editor.CaretLine
+                            |> List.map fst
+                            |> Set.ofList
+                        | false -> Set.empty
 
                     // Get declarations and generate list for MonoDevelop
-                    let! symbols = tyRes.GetDeclarationSymbols(line, column, lineToCaret)
+                    let! symbols = tyRes.GetDeclarationSymbols(line, column, lineToCaret, autoImport)
                     match symbols with
                     | Some (symbols, residue) ->
                         let isInAttribute = 
@@ -561,7 +566,7 @@ module Completion =
             result.AddRange filteredModifiers
         result
 
-    let codeCompletionCommandImpl(editor:TextEditor, documentContext:DocumentContext, context:CodeCompletionContext, ctrlSpace) =
+    let codeCompletionCommandImpl(editor:TextEditor, documentContext:DocumentContext, context:CodeCompletionContext, ctrlSpace, autoImport) =
         async {
             let line, col, lineStr = editor.GetLineInfoFromOffset context.TriggerOffset
             let completionContext = {
@@ -573,6 +578,7 @@ module Completion =
                 triggerOffset = context.TriggerOffset
                 ctrlSpace = ctrlSpace
                 documentContext = documentContext
+                autoImport = autoImport
             }
 
             let! results = async {
@@ -844,8 +850,8 @@ type FSharpTextEditorCompletion() =
                                     |> Option.bind(fun a -> a.ParseTree)
                                     |> Option.iter(fun tree -> openStatements.addOpenStatement x.Editor tree ns)))]
                     | _ -> ()
-
-                    return! Completion.codeCompletionCommandImpl(x.Editor, x.DocumentContext, context, false)
+                    let autoImport = IdeApp.Preferences.AddImportedItemsToCompletionList.Value
+                    return! Completion.codeCompletionCommandImpl(x.Editor, x.DocumentContext, context, false, autoImport)
                 }
                         
             Async.StartAsTask (computation = computation, cancellationToken = token)
