@@ -495,6 +495,7 @@ module Completion =
                         | true ->
                             openStatements.getOpenStatements tyRes.ParseTree editor.CaretLine
                             |> List.map fst
+                            |> List.append [ "global" ]
                             |> Set.ofList
                         | false -> Set.empty
 
