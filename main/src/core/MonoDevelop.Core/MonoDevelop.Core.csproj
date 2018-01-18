@@ -738,12 +738,8 @@
     <Compile Include="MonoDevelop.Projects.MSBuild\RemoteBuildEngine.cs" />
     <Compile Include="MonoDevelop.Projects.MSBuild\RemoteBuildEngineManager.cs" />
     <Compile Include="MonoDevelop.Projects.MSBuild\FileUtilities.cs" />
-    <Compile Include="MonoDevelop.FSW\OSX\FileSystemWatcher.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="MonoDevelop.FSW\OSX\FileSystemWatcher.OSX.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="MonoDevelop.FSW\OSX\FileSystemWatcher.cs" />
+    <Compile Include="MonoDevelop.FSW\OSX\FileSystemWatcher.OSX.cs" />
     <Compile Include="MonoDevelop.FSW\OSX\Interop.CoreFoundation.cs" />
     <Compile Include="MonoDevelop.FSW\OSX\Interop.Error.cs" />
     <Compile Include="MonoDevelop.FSW\OSX\Interop.EventStream.cs" />
@@ -760,12 +756,8 @@
     <Compile Include="MonoDevelop.FSW\OSX\SafeCreateHandle.OSX.cs" />
     <Compile Include="MonoDevelop.FSW\OSX\SafeEventStreamHandle.OSX.cs" />
     <Compile Include="MonoDevelop.FSW\OSX\SR.cs" />
-    <Compile Include="MonoDevelop.FSW\FileSystemWatcher.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="MonoDevelop.FSW\Mono\FileSystemWatcher.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="MonoDevelop.FSW\FileSystemWatcher.cs" />
+    <Compile Include="MonoDevelop.FSW\Mono\FileSystemWatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile.am" />
