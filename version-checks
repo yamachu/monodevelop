@@ -17,7 +17,7 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=de8ca8d554a9dc88cf89ccfb732f667607f1a2e1
+DEP_NEEDED_VERSION[0]=a273a32bec4733064d691290b36ef16754946537
 DEP_BRANCH_AND_REMOTE[0]="d15-6-bump-live-player origin/d15-6-bump-live-player"
 
 # heap-shot
