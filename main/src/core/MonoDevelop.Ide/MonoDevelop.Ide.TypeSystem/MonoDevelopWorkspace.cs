@@ -103,7 +103,9 @@ namespace MonoDevelop.Ide.TypeSystem
 				IdeApp.Workspace.ActiveConfigurationChanged += HandleActiveConfigurationChanged;
 			}
 			ISolutionCrawlerRegistrationService solutionCrawler = Services.GetService<ISolutionCrawlerRegistrationService> ();
-			//Options = Options.WithChangedOption (Microsoft.CodeAnalysis.Diagnostics.InternalRuntimeDiagnosticOptions.Syntax, true)
+			Options = Options.WithChangedOption (Microsoft.CodeAnalysis.Editor.Shared.Options.FeatureOnOffOptions.AutoFormattingOnReturn, LanguageNames.CSharp, true);
+            
+					//Options.WithChangedOption (Microsoft.CodeAnalysis.Diagnostics.InternalRuntimeDiagnosticOptions.Syntax, true)
 			//	.WithChangedOption (Microsoft.CodeAnalysis.Diagnostics.InternalRuntimeDiagnosticOptions.Semantic, true);
 
 			if (IdeApp.Preferences.EnableSourceAnalysis) {
