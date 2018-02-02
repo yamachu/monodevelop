@@ -17,8 +17,8 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=029323f456ab33f18c1ada87f9bebcaa40650922
-DEP_BRANCH_AND_REMOTE[0]="master origin/master"
+DEP_NEEDED_VERSION[0]=5a19cd5ebe20e13321464db3a34d5f7fc03ac0f2
+DEP_BRANCH_AND_REMOTE[0]="jstedfast-multiselect-asset-import origin/jstedfast-multiselect-asset-import"
 
 # heap-shot
 DEP[1]=heap-shot
