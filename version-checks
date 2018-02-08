@@ -17,7 +17,7 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=22b1efe574da0b3985952137a570a859d1a9f0cb
+DEP_NEEDED_VERSION[0]=362dc81ad28976727e56fe2a0f7f1eb7da3a42de
 DEP_BRANCH_AND_REMOTE[0]="nfc-entitlement-support origin/nfc-entitlement-support"
 
 # heap-shot
