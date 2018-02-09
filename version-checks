@@ -17,8 +17,8 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=276cc48b314971602904e105e0016d1418f69ae4
-DEP_BRANCH_AND_REMOTE[0]="master origin/master"
+DEP_NEEDED_VERSION[0]=8aca9f76bd3a1cc6c6192afb7e7c9cb83f7d17da
+DEP_BRANCH_AND_REMOTE[0]="corrado-fix-mpack-perms origin/corrado-fix-mpack-perms"
 
 # heap-shot
 DEP[1]=heap-shot
