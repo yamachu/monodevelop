@@ -43,8 +43,44 @@ using MonoDevelop.Ide.Tasks;
 
 namespace MonoDevelop.Ide.BuildOutputView
 {
+	public class AsyncAutoResetEvent
+	{
+		private readonly static Task s_completed = Task.FromResult(true); 
+		private readonly Queue<TaskCompletionSource<bool>> m_waits = new Queue<TaskCompletionSource<bool>>(); 
+		private bool m_signaled; 
+
+		public Task WaitAsync ()
+		{
+			lock (m_waits) {
+				if (m_signaled) {
+					m_signaled = false;
+					return s_completed;
+				} else {
+					var tcs = new TaskCompletionSource<bool> ();
+					m_waits.Enqueue (tcs);
+					return tcs.Task;
+				}
+			}
+		}
+
+		public void Set ()
+		{
+			TaskCompletionSource<bool> toRelease = null;
+			lock (m_waits) {
+				if (m_waits.Count > 0)
+					toRelease = m_waits.Dequeue ();
+				else if (!m_signaled)
+					m_signaled = true;
+			}
+			if (toRelease != null)
+				toRelease.SetResult (true);
+		}
+	}
+
 	class BuildOutputWidget : VBox, IPathedDocument
 	{
+		readonly AsyncAutoResetEvent processLogAutoResetEvent = new AsyncAutoResetEvent ();
+
 		TreeView treeView;
 		ScrollView scrolledWindow;
 		CheckBox showDiagnosticsButton;
@@ -193,18 +229,21 @@ namespace MonoDevelop.Ide.BuildOutputView
 			PackStart (scrolledWindow, expand: true, fill: true);
 		}
 
-		internal void GoToError (string description, string project)
+		async internal Task GoToError (string description, string project)
 		{
+			await autoResetEvent.WaitAsync ();
 			ExpandNode (project, BuildOutputNodeType.Error, description);
 		}
 
-		internal void GoToWarning (string description, string project)
+		async internal Task GoToWarning (string description, string project)
 		{
+			await autoResetEvent.WaitAsync ();
 			ExpandNode (project, BuildOutputNodeType.Warning, description);
 		}
 
-		internal void GoToMessage (string description, string project)
+		async internal Task GoToMessage (string description, string project)
 		{
+			await autoResetEvent.WaitAsync ();
 			ExpandNode (project, BuildOutputNodeType.Message, description);
 		}
 
@@ -360,7 +399,6 @@ namespace MonoDevelop.Ide.BuildOutputView
 
 			return Task.Run (async () => {
 				await Runtime.RunInMainThread (() => {
-
 					BuildOutput.ProcessProjects ();
 					treeBuildOutputNodes = BuildOutput.GetRootNodes (showDiagnostics);
 					search = new BuildOutputDataSearch (treeBuildOutputNodes);
@@ -378,9 +416,14 @@ namespace MonoDevelop.Ide.BuildOutputView
 						treeView.ExpandRow (root, false);
 						ExpandChildrenWithErrors (treeView, buildOutputDataSource, root);
 					}
+
+
 				});
+				autoResetEvent.Set ();
 			}, cts.Token);
 		}
+
+		readonly AsyncAutoResetEvent autoResetEvent = new AsyncAutoResetEvent ();
 
 		public bool IsSearchInProgress { get; private set; } = false;
 

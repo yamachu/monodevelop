@@ -49,10 +49,10 @@ namespace MonoDevelop.Ide.BuildOutputView
 			control.FileSaved += FileNameChanged;
 		}
 
-		public BuildOutputViewContent (BuildOutputWidget widget)
+		public BuildOutputViewContent (BuildOutput buildOutput)
 		{
-			ContentName = widget.ViewContentName;
-			control = widget;
+			ContentName = $"{GettextCatalog.GetString ("Build Output")} {DateTime.Now.ToString ("hh:mm:ss")}.binlog";
+			control = new BuildOutputWidget (buildOutput, ContentName);
 			control.FileSaved += FileNameChanged;
 		}
 
@@ -97,19 +97,19 @@ namespace MonoDevelop.Ide.BuildOutputView
 			base.Dispose ();
 		}
 
-		internal void GoToError (string description, string project)
+		async internal Task GoToError (string description, string project)
 		{
-			control.GoToError (description, project);
+			await control.GoToError (description, project);
 		}
 
-		internal void GoToWarning (string description, string project)
+		async internal Task GoToWarning (string description, string project)
 		{
-			control.GoToWarning (description, project);
+			await control.GoToWarning (description, project);
 		}
 
-		internal void GoToMessage (string description, string project)
+		async internal Task GoToMessage (string description, string project)
 		{
-			control.GoToMessage (description, project);
+			await control.GoToMessage (description, project);
 		}
 
 		[CommandHandler (SearchCommands.Find)]
