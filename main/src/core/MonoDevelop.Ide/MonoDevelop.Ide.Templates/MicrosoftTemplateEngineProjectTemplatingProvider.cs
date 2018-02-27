@@ -87,8 +87,11 @@ namespace MonoDevelop.Ide.Templates
 			//if (!paths.Exists (paths.User.BaseDir) || !paths.Exists (paths.User.FirstRunCookie)) {
 			paths.DeleteDirectory (paths.User.BaseDir);//Delete cache
 			var settingsLoader = (SettingsLoader)environmentSettings.SettingsLoader;
-			foreach (var scanPath in TemplatesNodes.Select (t => t.ScanPath).Distinct ()) {
-				settingsLoader.UserTemplateCache.Scan (scanPath);
+			foreach (var path in TemplatesNodes.Select (t => t.ScanPath).Distinct ()) {
+				string scanPath = StringParserService.Parse (path);
+				if (!string.IsNullOrEmpty (scanPath)) {
+					settingsLoader.UserTemplateCache.Scan (scanPath);
+				}
 			}
 			settingsLoader.Save ();
 			paths.WriteAllText (paths.User.FirstRunCookie, "");
