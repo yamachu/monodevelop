@@ -17,8 +17,8 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=1c2813f9151af4e6d4b5c0778aa6697c3f0f69a5
-DEP_BRANCH_AND_REMOTE[0]="d15-6 origin/d15-6"
+DEP_NEEDED_VERSION[0]=03fc2b9274f22ba36f1d4c5a39e1d72585f7497e
+DEP_BRANCH_AND_REMOTE[0]="alaskaair-login-issue-15-6 origin/alaskaair-login-issue-15-6"
 
 # heap-shot
 DEP[1]=heap-shot
