@@ -33,6 +33,7 @@ using System.Linq;
 using Mono.Addins.Description;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MonoDevelop.Tests.TestRunner
 {
@@ -68,17 +69,41 @@ namespace MonoDevelop.Tests.TestRunner
 			// Make sure the updater is disabled while running tests
 			Runtime.Preferences.EnableUpdaterForCurrentSession = false;
 
+			Thread t = new Thread (Record);
+			t.IsBackground = true;
+			t.Start ();
+
+			int result;
 			if (guiUnitAsm != null) {
 				Xwt.XwtSynchronizationContext.AutoInstall = false;
 				var sc = new Xwt.XwtSynchronizationContext ();
 				System.Threading.SynchronizationContext.SetSynchronizationContext (sc);
 				Runtime.MainSynchronizationContext = sc;
 				var method = guiUnitAsm.EntryPoint;
-				return Task.FromResult ((int)method.Invoke (null, new [] { args.ToArray () }));
+				result = (int)method.Invoke (null, new [] { args.ToArray () });
+			} else {
+				args.RemoveAll (a => a.StartsWith ("-port=", StringComparison.Ordinal));
+				args.Add ("-domain=None");
+				result = NUnit.ConsoleRunner.Runner.Main (args.ToArray ());
 			}
-			args.RemoveAll (a => a.StartsWith ("-port=", StringComparison.Ordinal));
-			args.Add ("-domain=None");
-			return Task.FromResult (NUnit.ConsoleRunner.Runner.Main (args.ToArray ()));
+
+			var loc = Path.GetDirectoryName (typeof (Runer).Assembly.Location);
+			var png = Path.Combine (Path.Combine (loc, "..", "..", "..", "tests", "screenshot_final.png"));
+			Core.Runtime.ProcessService.StartProcess ("screencapture", "\"" + png + "\"", null, null);
+			return Task.FromResult (result);
+		}
+
+		void Record ()
+		{
+			var loc = Path.GetDirectoryName (typeof (Runer).Assembly.Location);
+			loc = Path.Combine (Path.Combine (loc, "..", "..", "..", "tests"));
+			int num = 1;
+			while (true) {
+				System.Threading.Thread.Sleep (30000);
+				var png = Path.Combine (Path.Combine (loc, "screenshot" + num + ".png"));
+				Core.Runtime.ProcessService.StartProcess ("screencapture", "\"" + png + "\"", null, null);
+				num++;
+			}
 		}
 
 		static IEnumerable<string> GetAddinsFromReferences (AssemblyName aname)
