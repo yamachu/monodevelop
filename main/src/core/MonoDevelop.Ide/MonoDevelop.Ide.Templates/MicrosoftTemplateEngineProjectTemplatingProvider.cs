@@ -67,7 +67,6 @@ namespace MonoDevelop.Ide.Templates
 			UpdateCache ();
 		}
 
-		static List<TemplateExtensionNode> TemplatesNodes = new List<TemplateExtensionNode> ();
 		static List<MicrosoftTemplateEngineSolutionTemplate> templates = new List<MicrosoftTemplateEngineSolutionTemplate> ();
 
 		static void UpdateCache ()
@@ -78,7 +77,8 @@ namespace MonoDevelop.Ide.Templates
 			// Prevent a TypeInitializationException in when calling SettingsLoader.Save when no templates
 			// are available, which throws an exception, by returning here. This prevents the MonoDevelop.Ide addin
 			// from loading. In practice this should not happen unless the .NET Core addin is disabled.
-			if (!TemplatesNodes.Any ())
+			var templateNodes = AddinManager.GetExtensionNodes<TemplateExtensionNode> ("/MonoDevelop/Ide/Templates");
+			if (!templateNodes.Any ())
 				return;
 
 			var paths = new Paths (environmentSettings);
@@ -87,7 +87,7 @@ namespace MonoDevelop.Ide.Templates
 			//if (!paths.Exists (paths.User.BaseDir) || !paths.Exists (paths.User.FirstRunCookie)) {
 			paths.DeleteDirectory (paths.User.BaseDir);//Delete cache
 			var settingsLoader = (SettingsLoader)environmentSettings.SettingsLoader;
-			foreach (var scanPath in TemplatesNodes.Select (t => t.ScanPath).Distinct ()) {
+			foreach (var scanPath in templateNodes.Select (t => t.ScanPath).Distinct ()) {
 				settingsLoader.UserTemplateCache.Scan (scanPath);
 			}
 			settingsLoader.Save ();
@@ -95,7 +95,7 @@ namespace MonoDevelop.Ide.Templates
 			//}
 			var templateInfos = settingsLoader.UserTemplateCache.List (false, t => new MatchInfo ()).ToDictionary (m => m.Info.Identity, m => m.Info);
 			var newTemplates = new List<MicrosoftTemplateEngineSolutionTemplate> ();
-			foreach (var template in TemplatesNodes) {
+			foreach (var template in templateNodes) {
 				ITemplateInfo templateInfo;
 				if (!templateInfos.TryGetValue (template.TemplateId, out templateInfo)) {
 					LoggingService.LogWarning ("Template {0} not found.", template.TemplateId);
@@ -108,30 +108,6 @@ namespace MonoDevelop.Ide.Templates
 
 		static void OnExtensionChanged (object s, ExtensionNodeEventArgs args)
 		{
-			if (args.Change == ExtensionChange.Add) {
-				var codon = (TemplateExtensionNode)args.ExtensionNode;
-				try {
-					TemplatesNodes.Add (codon);
-				} catch (Exception e) {
-					string extId = null, addinId = null;
-					if (codon != null) {
-						if (codon.HasId)
-							extId = codon.Id;
-						if (codon.Addin != null)
-							addinId = codon.Addin.Id;
-					}
-					LoggingService.LogError ("Error loading template id {0} in addin {1}:\n{2}",
-											 extId ?? "(null)", addinId ?? "(null)", e.ToString ());
-				}
-			} else {
-				foreach (var pt in TemplatesNodes) {
-					var codon = (TemplateExtensionNode)args.ExtensionNode;
-					if (pt.Id == codon.Id) {
-						TemplatesNodes.Remove (pt);
-						break;
-					}
-				}
-			}
 			UpdateCache ();
 		}
 
