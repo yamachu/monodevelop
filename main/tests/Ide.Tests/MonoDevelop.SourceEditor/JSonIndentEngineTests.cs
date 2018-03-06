@@ -30,6 +30,8 @@ using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.JSon;
 using ICSharpCode.NRefactory6.CSharp;
+using UnitTests;
+using System.IO;
 
 namespace MonoDevelop.SourceEditor
 {
@@ -113,6 +115,8 @@ $
 			var engine = CreateEngine ("\r\n{\r\n$\r\n");
 			Assert.AreEqual (indentString, engine.ThisLineIndent);
 			Assert.AreEqual (indentString, engine.NextLineIndent);
+			var png = Path.Combine (Util.TestsRootDir, "screenshot.png");
+			Core.Runtime.ProcessService.StartProcess ("screencapture", "\"" + png + "\"", null, null);
 		}
 
 		/// <summary>
