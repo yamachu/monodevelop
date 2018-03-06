@@ -142,8 +142,11 @@ class MonoDevelopProcessHost
 			}
 
 			var task = tool.Run (toolArgs);
+			Console.WriteLine ("XXXX Tool executed");
 			task.ContinueWith ((t) => sc.ExitLoop ());
+			Console.WriteLine ("XXXX Running main loop");
 			sc.RunMainLoop ();
+			Console.WriteLine ("XXXX Main loop exited");
 			return task.Result;
 
 		} catch (UserException ex) {
@@ -252,16 +255,21 @@ class MonoDevelopProcessHost
 		public void RunMainLoop ()
 		{
 			do {
+				Console.WriteLine ("XXXX RunMainLoop");
 				Tuple<SendOrPostCallback,object> next = null;
 				lock (work) {
+					Console.WriteLine ("XXXX RunMainLoop0 " + work.Count);
 					if (work.Count > 0 && !endLoop)
 						next = work.Dequeue ();
 					else if (!endLoop)
 						Monitor.Wait (work);
 				}
+				Console.WriteLine ("XXXX RunMainLoop1 " + next);
 				if (next != null) {
 					try {
+						Console.WriteLine ("XXXX RunMainLoop2 " + next.Item2);
 						next.Item1 (next.Item2);
+						Console.WriteLine ("XXXX RunMainLoop3");
 					} catch (Exception ex) {
 						Console.WriteLine (ex);
 					}
@@ -272,6 +280,7 @@ class MonoDevelopProcessHost
 		public void ExitLoop ()
 		{
 			lock (work) {
+				Console.WriteLine ("XXXX ExitLoop");
 				endLoop = true;
 				Monitor.Pulse (work);
 			}
