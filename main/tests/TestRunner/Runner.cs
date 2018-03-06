@@ -90,6 +90,9 @@ namespace MonoDevelop.Tests.TestRunner
 			var loc = Path.GetDirectoryName (typeof (Runer).Assembly.Location);
 			var png = Path.Combine (Path.Combine (loc, "..", "..", "..", "tests", "screenshot_final.png"));
 			Core.Runtime.ProcessService.StartProcess ("screencapture", "\"" + png + "\"", null, null);
+
+			var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
+			Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
 			return Task.FromResult (result);
 		}
 
