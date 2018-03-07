@@ -38,6 +38,7 @@ using MonoDevelop.Core;
 using MonoDevelop.Core.Execution;
 using MonoDevelop.Core.Serialization;
 using MonoDevelop.Core.Assemblies;
+using System.Threading;
 
 namespace MonoDevelop.DesignerSupport.Toolbox
 {
@@ -56,6 +57,7 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		readonly Hashtable values = new Hashtable ();
 		Dictionary<TargetRuntime, ExternalLoader> externalLoaders;
 		int counter;
+		CancellationTokenSource cancellationTokenSource = new CancellationTokenSource ();
 
 		public LoaderContext ()
 		{
@@ -66,6 +68,8 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		{
 			Dispose ();
 		}
+
+		public CancellationToken CancellationToken => cancellationTokenSource.Token;
 		
 		public T CreateExternalLoader<T> (TargetRuntime runtime) where T:MarshalByRefObject
 		{
@@ -123,6 +127,7 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		internal void Dispose ()
 		{
 			Runtime.ShuttingDown -= OnShutdown;
+			cancellationTokenSource.Cancel ();
 
 			foreach (object ob in values.Values) {
 				if (ob is IDisposable) {

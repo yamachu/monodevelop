@@ -45,6 +45,7 @@ namespace MonoDevelop.GtkCore.GuiBuilder
 
 		public virtual IList<ItemToolboxNode> Load (LoaderContext ctx, string filename)
 		{
+			Console.WriteLine ("LOAD " + filename);
 			SystemPackage sp = Runtime.SystemAssemblyService.DefaultAssemblyContext.GetPackageFromPath (filename);
 			ReferenceType rt;
 			string rname;
@@ -58,10 +59,17 @@ namespace MonoDevelop.GtkCore.GuiBuilder
 			}
 			
 			List<ItemToolboxNode> list = new List<ItemToolboxNode> ();
+
+			if (ctx.CancellationToken.IsCancellationRequested)
+				return list;
+			
 			var types = Runtime.RunInMainThread (delegate {
+				Console.WriteLine ("  f1 " + filename);
 				// Stetic is not thread safe, it has to be used from the gui thread
 				return GuiBuilderService.SteticApp.GetComponentTypes (filename);
-			}).Result;
+			}).WaitAndGetResult (ctx.CancellationToken);
+
+			Console.WriteLine ("  f2 " + filename);
 			foreach (ComponentType ct in types) {
 				if (ct.Category == "window")
 					continue;

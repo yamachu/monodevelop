@@ -185,14 +185,20 @@ namespace MonoDevelop.DesignerSupport
 						Console.WriteLine ("PP2");
 						if (files != null) {
 							ctx = new LoaderContext ();
-							foreach (string f in files)
+							foreach (string f in files) {
+								if (ctx.CancellationToken.IsCancellationRequested)
+									break;
 								nodes.AddRange (GetFileItems (ctx, f));
+							}
 						}
 					} finally {
 						if (ctx != null)
 							ctx.Dispose ();
 					}
 
+					if (!Runtime.Initialized)
+						return;
+					
 					Runtime.RunInMainThread (delegate {
 						AddUserItems (nodes);
 						initializing--;
@@ -238,8 +244,12 @@ namespace MonoDevelop.DesignerSupport
 				
 				if (!fileName.EndsWith (loader.FileTypes[0]))
 					continue;
+
+				Console.WriteLine ("LOADER LOAD " + loader + " " + fileName);
 				
 				try {
+					if (ctx.CancellationToken.IsCancellationRequested)
+						break;
 					IList<ItemToolboxNode> loadedItems = loader.Load (ctx, fileName);
 					items.AddRange (loadedItems);
 				}

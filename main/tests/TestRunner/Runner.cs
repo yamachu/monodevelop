@@ -83,8 +83,8 @@ namespace MonoDevelop.Tests.TestRunner
 				result = NUnit.ConsoleRunner.Runner.Main (args.ToArray ());
 			}
 
-			Thread t = new Thread (Log);
-			t.Start ();
+			//Thread t = new Thread (Log);
+			//t.Start ();
 			return Task.FromResult (result);
 		}
 
