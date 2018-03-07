@@ -69,10 +69,6 @@ namespace MonoDevelop.Tests.TestRunner
 			// Make sure the updater is disabled while running tests
 			Runtime.Preferences.EnableUpdaterForCurrentSession = false;
 
-			Thread t = new Thread (Record);
-			t.IsBackground = true;
-			t.Start ();
-
 			int result;
 			if (guiUnitAsm != null) {
 				Xwt.XwtSynchronizationContext.AutoInstall = false;
@@ -87,26 +83,9 @@ namespace MonoDevelop.Tests.TestRunner
 				result = NUnit.ConsoleRunner.Runner.Main (args.ToArray ());
 			}
 
-			var loc = Path.GetDirectoryName (typeof (Runer).Assembly.Location);
-			var png = Path.Combine (Path.Combine (loc, "..", "..", "..", "tests", "screenshot_final.png"));
-			Core.Runtime.ProcessService.StartProcess ("screencapture", "\"" + png + "\"", null, null);
-
-			var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
-			Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
+//			var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
+//			Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
 			return Task.FromResult (result);
-		}
-
-		void Record ()
-		{
-			var loc = Path.GetDirectoryName (typeof (Runer).Assembly.Location);
-			loc = Path.Combine (Path.Combine (loc, "..", "..", "..", "tests"));
-			int num = 1;
-			while (true) {
-				System.Threading.Thread.Sleep (30000);
-				var png = Path.Combine (Path.Combine (loc, "screenshot" + num + ".png"));
-				Core.Runtime.ProcessService.StartProcess ("screencapture", "\"" + png + "\"", null, null);
-				num++;
-			}
 		}
 
 		static IEnumerable<string> GetAddinsFromReferences (AssemblyName aname)
