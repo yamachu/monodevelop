@@ -83,8 +83,10 @@ namespace MonoDevelop.Tests.TestRunner
 				result = NUnit.ConsoleRunner.Runner.Main (args.ToArray ());
 			}
 
-//			var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
-//			Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
+			Task.Delay (30000).ContinueWith (t => {
+				var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
+				Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
+			});
 			return Task.FromResult (result);
 		}
 
