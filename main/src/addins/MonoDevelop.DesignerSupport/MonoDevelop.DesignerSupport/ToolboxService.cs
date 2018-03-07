@@ -180,7 +180,9 @@ namespace MonoDevelop.DesignerSupport
 
 					LoaderContext ctx = null;
 					try {
+						Console.WriteLine ("PP1");
 						IEnumerable<string> files = provider.GetDefaultFiles ();
+						Console.WriteLine ("PP2");
 						if (files != null) {
 							ctx = new LoaderContext ();
 							foreach (string f in files)

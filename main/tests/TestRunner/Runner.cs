@@ -83,11 +83,17 @@ namespace MonoDevelop.Tests.TestRunner
 				result = NUnit.ConsoleRunner.Runner.Main (args.ToArray ());
 			}
 
-			Task.Delay (30000).ContinueWith (t => {
-				var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
-				Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
-			});
+			Thread t = new Thread (Log);
+			t.Start ();
 			return Task.FromResult (result);
+		}
+
+		static void Log ()
+		{
+			Thread.Sleep (30000);
+			var pid = System.Diagnostics.Process.GetCurrentProcess ().Id;
+			Core.Runtime.ProcessService.StartProcess ("kill", "-QUIT " + pid, null, null);
+			Thread.Sleep (10000);
 		}
 
 		static IEnumerable<string> GetAddinsFromReferences (AssemblyName aname)
