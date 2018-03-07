@@ -71,6 +71,8 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		{
 			if (externalLoaders == null)
 				externalLoaders = new Dictionary<TargetRuntime, ExternalLoader> ();
+			if (!Runtime.Initialized)
+				throw new InvalidOperationException ();
 			
 			ExternalLoader eloader;
 			if (!externalLoaders.TryGetValue (runtime, out eloader)) {
