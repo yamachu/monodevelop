@@ -69,8 +69,6 @@ namespace MonoDevelop.DesignerSupport
 			if (IdeApp.Workbench != null)
 				IdeApp.Workbench.ActiveDocumentChanged += new EventHandler (onActiveDocChanged);
 
-			Console.WriteLine ("********** CREATING ToolboxService");
-			Console.WriteLine (Environment.StackTrace);
 			AddinManager.AddExtensionNodeHandler (toolboxLoaderPath, OnLoaderExtensionChanged);
 			AddinManager.AddExtensionNodeHandler (toolboxProviderPath, OnProviderExtensionChanged);
 			
@@ -161,8 +159,6 @@ namespace MonoDevelop.DesignerSupport
 		
 		public void RegisterDefaultToolboxProvider (IToolboxDefaultProvider provider)
 		{
-			Console.WriteLine ("RegisterDefaultToolboxProvider 1");
-			Console.WriteLine (Environment.StackTrace);
 			string pname = provider.GetType().FullName;
 			
 			if (!Configuration.LoadedDefaultProviders.Contains (pname)) {
@@ -171,6 +167,8 @@ namespace MonoDevelop.DesignerSupport
 				OnToolboxContentsChanged ();
 
 				System.Threading.ThreadPool.QueueUserWorkItem (delegate {
+					if (!Runtime.Initialized)
+						return;
 					List<ItemToolboxNode> nodes = new List<ItemToolboxNode> ();
 					try {
 						IEnumerable<ItemToolboxNode> newItems = provider.GetDefaultItems ();
