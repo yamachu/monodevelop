@@ -56,6 +56,16 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		readonly Hashtable values = new Hashtable ();
 		Dictionary<TargetRuntime, ExternalLoader> externalLoaders;
 		int counter;
+
+		public LoaderContext ()
+		{
+			Runtime.ShuttingDown += OnShutdown;
+		}
+
+		void OnShutdown (object s, EventArgs args)
+		{
+			Dispose ();
+		}
 		
 		public T CreateExternalLoader<T> (TargetRuntime runtime) where T:MarshalByRefObject
 		{
@@ -110,6 +120,8 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		
 		internal void Dispose ()
 		{
+			Runtime.ShuttingDown -= OnShutdown;
+
 			foreach (object ob in values.Values) {
 				if (ob is IDisposable) {
 					try {
