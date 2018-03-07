@@ -68,7 +68,9 @@ namespace MonoDevelop.DesignerSupport
 			// Null check here because the service may be loaded in an external process
 			if (IdeApp.Workbench != null)
 				IdeApp.Workbench.ActiveDocumentChanged += new EventHandler (onActiveDocChanged);
-			
+
+			Console.WriteLine ("********** CREATING ToolboxService");
+			Console.WriteLine (Environment.StackTrace);
 			AddinManager.AddExtensionNodeHandler (toolboxLoaderPath, OnLoaderExtensionChanged);
 			AddinManager.AddExtensionNodeHandler (toolboxProviderPath, OnProviderExtensionChanged);
 			
