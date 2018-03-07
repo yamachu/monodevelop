@@ -161,6 +161,8 @@ namespace MonoDevelop.DesignerSupport
 		
 		public void RegisterDefaultToolboxProvider (IToolboxDefaultProvider provider)
 		{
+			Console.WriteLine ("RegisterDefaultToolboxProvider 1");
+			Console.WriteLine (Environment.StackTrace);
 			string pname = provider.GetType().FullName;
 			
 			if (!Configuration.LoadedDefaultProviders.Contains (pname)) {
@@ -591,6 +593,8 @@ namespace MonoDevelop.DesignerSupport
 				monitor.BeginTask (GettextCatalog.GetString ("Looking for components..."), toupdate.Count);
 				LoaderContext ctx = new LoaderContext ();
 				try {
+					Console.WriteLine ("GetComponentIndex");
+					Console.WriteLine (Environment.StackTrace);
 					await Task.Run (() => {
 						foreach (ComponentIndexFile ia in toupdate) {
 							ia.Update (ctx);

@@ -83,6 +83,9 @@ namespace MonoDevelop.DesignerSupport.Toolbox
 		
 		public IList<ItemToolboxNode> LoadItemsIsolated (TargetRuntime runtime, Type loaderType, string filename)
 		{
+			Console.WriteLine ("LoadItemsIsolated");
+			Console.WriteLine (Environment.StackTrace);
+
 			if (!typeof(IExternalToolboxLoader).IsAssignableFrom (loaderType))
 				throw new InvalidOperationException ("Type '" + loaderType + "' does not implement 'IExternalToolboxLoader'");
 			try {
