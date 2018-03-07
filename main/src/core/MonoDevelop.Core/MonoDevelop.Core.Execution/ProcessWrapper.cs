@@ -20,6 +20,7 @@ namespace MonoDevelop.Core.Execution
 		ProcessAsyncOperation operation;
 		IDisposable customCancelToken;
 		TaskCompletionSource<int> taskCompletionSource = new TaskCompletionSource<int> ();
+		int id;
 		
 		public ProcessWrapper ()
 		{
@@ -51,6 +52,8 @@ namespace MonoDevelop.Core.Execution
 				endEventErr.Set ();
 			}
 			operation.ProcessId = Id;
+			id = Id;
+			Console.WriteLine ($"STARTED PROCESS {Id}: {StartInfo.FileName} {StartInfo.Arguments}");
 		}
 
 		public void SetCancellationToken (CancellationToken cancelToken)
@@ -176,6 +179,8 @@ namespace MonoDevelop.Core.Execution
 
 		void OnExited (object sender, EventArgs args)
 		{
+			Console.WriteLine ($"EXITED PROCESS {id}: {StartInfo.FileName} {StartInfo.Arguments}");
+
 			if (customCancelToken != null) {
 				customCancelToken.Dispose ();
 				customCancelToken = null;
