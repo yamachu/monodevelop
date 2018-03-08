@@ -17,7 +17,7 @@ DEP[0]=md-addins
 DEP_NAME[0]=MDADDINS
 DEP_PATH[0]=${top_srcdir}/../md-addins
 DEP_MODULE[0]=git@github.com:xamarin/md-addins.git
-DEP_NEEDED_VERSION[0]=7d39ae8e2543319ed708c6618e017244bcc8265b
+DEP_NEEDED_VERSION[0]=b27b52dec09a5d62105c5649e33a71027469d079
 DEP_BRANCH_AND_REMOTE[0]="avdlaunch-relative-path origin/avdlaunch-relative-path"
 
 # heap-shot
