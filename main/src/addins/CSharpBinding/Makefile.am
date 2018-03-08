@@ -1,4 +1,4 @@
-SUBDIRS = . Autotools AspNet
+SUBDIRS = . Autotools
 
 include $(top_srcdir)/xbuild.include
 

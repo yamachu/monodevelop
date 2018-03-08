@@ -301,8 +301,6 @@ namespace MonoDevelop.AspNet.Projects
 				return WebSubtype.Svg;
 			case "STYL":
 				return WebSubtype.Stylus;
-			case "CSHTML":
-				return WebSubtype.Razor;
 			default:
 				return WebSubtype.None;
 			}

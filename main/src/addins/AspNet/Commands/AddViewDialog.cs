@@ -225,8 +225,6 @@ namespace MonoDevelop.AspNet.Commands
 		IEnumerable<string> GetProperViewEngines ()
 		{
 			yield return "Aspx";
-			if (aspFlavor.SupportsRazorViewEngine)
-				yield return "Razor";
 		}
 
 		void InitializeTemplateStore (IDictionary<string, IList<string>> tempList)
@@ -277,7 +275,7 @@ namespace MonoDevelop.AspNet.Commands
 			bool canHaveMaster = !IsPartialView;
 			masterCheck.Sensitive = canHaveMaster;
 			masterPanel.Sensitive = canHaveMaster && HasMaster;
-			placeholderLabel.Sensitive = placeholderCombo.Sensitive = masterPanel.Sensitive && ActiveViewEngine != "Razor";
+			placeholderLabel.Sensitive = placeholderCombo.Sensitive = masterPanel.Sensitive;
 			MasterChanged (null, null);
 			Validate ();
 		}
@@ -311,7 +309,7 @@ namespace MonoDevelop.AspNet.Commands
 			if (!IsValidIdentifier (ViewName))
 				return false;
 
-			if (!IsPartialView && HasMaster && ActiveViewEngine != "Razor") {
+			if (!IsPartialView && HasMaster) {
 				if (String.IsNullOrEmpty (MasterFile) || !File.Exists (aspFlavor.VirtualToLocalPath (oldMaster, null)))
 					return false;
 				//PrimaryPlaceHolder can be empty
@@ -332,13 +330,8 @@ namespace MonoDevelop.AspNet.Commands
 		protected virtual void ShowMasterSelectionDialog (object sender, EventArgs e)
 		{
 			string pattern, title;
-			if (ActiveViewEngine == "Razor") {
-				pattern = "*.cshtml";
-				title = GettextCatalog.GetString ("Select a Layout file...");
-			} else {
-				pattern = "*.master";
-				title = GettextCatalog.GetString ("Select a Master Page...");
-			}
+			pattern = "*.master";
+			title = GettextCatalog.GetString ("Select a Master Page...");
 			var dialog = new MonoDevelop.Ide.Projects.ProjectFileSelectorDialog (project, null, pattern)
 			{
 				Title = title,

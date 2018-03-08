@@ -1,5 +1,5 @@
 <ExtensionModel>
-	
+
 	<Runtime>
 		<Import assembly = "System.Web.Helpers.dll" />
 		<Import assembly = "System.Web.Mvc.dll" />
@@ -83,10 +83,6 @@
 	</ExtensionPoint>
 
 	<ExtensionPoint path = "/MonoDevelop/Asp/CompletionBuilders">
-		<ExtensionNode name="Class" />
-	</ExtensionPoint>
-
-	<ExtensionPoint path = "/MonoDevelop/Razor/CompletionBuilders">
 		<ExtensionNode name="Class" />
 	</ExtensionPoint>
 
@@ -174,7 +170,7 @@
 		              file = "Templates/EmptyJsonFile.xft.xml"/>
 		<FileTemplate id   = "EmptyTypeScriptFile"
 		              file = "Templates/EmptyTypeScriptFile.xft.xml"/>
-		
+
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/FileTemplateTypes">
@@ -185,7 +181,7 @@
 		<FileFilter id = "AspNetWebFiles"
 		            insertafter = "Xml"
 		           _label = "ASP.NET Files"
-		           extensions = "*.aspx,*.ashx,*.asmx,*.ascx,*.master,*.asax,*.cshtml" />
+		           extensions = "*.aspx,*.ashx,*.asmx,*.ascx,*.master,*.asax" />
 		<FileFilter id = "Html"
 		            _label = "HTML Files"
 		            extensions = "*.htm,*.html"/>
@@ -206,19 +202,18 @@
 			alias="AspNetMvc3" />
 		<ProjectFlavor
 			guid="{E3E379DF-F4C6-4180-9B81-6769533ABE47}"
-			type="MonoDevelop.AspNet.Projects.AspMvc4ProjectFlavor" 
+			type="MonoDevelop.AspNet.Projects.AspMvc4ProjectFlavor"
 			alias="AspNetMvc4" />
 		<ProjectFlavor
 			id="MonoDevelop.AspNet.Projects.AspNetAppProjectFlavor"
 			guid="{349C5851-65DF-11DA-9384-00065B846F21}"
-			type="MonoDevelop.AspNet.Projects.AspNetAppProjectFlavor" 
+			type="MonoDevelop.AspNet.Projects.AspNetAppProjectFlavor"
 			alias="AspNetApp" />
 	</Extension>
 
 	<Extension path = "/MonoDevelop/TypeSystem/Parser">
 		<Parser class = "MonoDevelop.AspNet.WebForms.WebFormsParser" mimeType="application/x-aspx, application/x-ascx, application/x-master-page" />
 		<Parser class = "MonoDevelop.AspNet.Html.HtmlParser" mimeType="text/html, application/x-spark" />
-		<Parser class = "MonoDevelop.AspNet.Razor.RazorCSharpParser" mimeType="text/x-cshtml" />
 	</Extension>
 
 	<Extension path = "/MonoDevelop/ProjectModel/SerializableClasses">
@@ -342,7 +337,6 @@
 	<Extension path = "/MonoDevelop/Ide/TextEditorExtensions">
 		<Class fileExtensions=".aspx, .ascx, .master" class = "MonoDevelop.AspNet.WebForms.WebFormsEditorExtension" />
 		<Class mimeTypes="text/html,application/x-spark" class = "MonoDevelop.AspNet.Html.HtmlEditorExtension" />
-		<Class mimeTypes="text/x-cshtml" class = "MonoDevelop.AspNet.Razor.RazorCSharpEditorExtension" />
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Html/DocTypes">
@@ -366,10 +360,9 @@
 	<Extension path = "/MonoDevelop/Core/ExecutionHandlers">
 		<ExecutionHandler id="AspNet" class = "MonoDevelop.AspNet.Execution.AspNetExecutionHandler"/>
 	</Extension>
-	
+
 	<Extension path = "/MonoDevelop/Ide/CompletionCharacters">
 		<Complete language="Html" commitOnSpace="True" commitChars="{}[]().,:;+-*/%&amp;|^!~=&lt;&gt;?@#'&quot;\" />
-		<Complete language="Razor" commitOnSpace="True" commitChars="{}[]().,:;+-*/%&amp;|^!~=&lt;&gt;?@#'&quot;\"/>
 	</Extension>
 
 	<Extension path = "/MonoDevelop/SourceEditor2/ContextMenu/Editor">
@@ -382,18 +375,10 @@
 			<CommandItem id = "MonoDevelop.AspNet.Commands.AspNetCommands.GoToController" insertbefore="MonoDevelop.Ide.Commands.EditCommands.Cut" />
 			<SeparatorItem id = "MvcSeparator2" />
 		</Condition>
-		<Condition id="FileType" mimeType="text/x-cshtml">
-			<CommandItem id = "MonoDevelop.AspNet.Commands.AspNetCommands.GoToController" insertbefore="MonoDevelop.Ide.Commands.EditCommands.Cut" />
-			<SeparatorItem id = "MvcSeparator2" />
-		</Condition>
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/CodeTemplates">
 		<CodeTemplate file="Razor/Razor-templates.xml" />
-	</Extension>
-
-	<Extension path = "/MonoDevelop/Ide/CodeFormatters">
-		<Formatter mimeType="text/x-cshtml" class="MonoDevelop.AspNet.Razor.RazorCSharpFormatter" />
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/CustomTools">
@@ -412,7 +397,7 @@
 	<Extension path="/MonoDevelop/Ide/TemplateImages">
 		<Image id="md-aspnet-empty-project" resource="project-aspnet-template.png" />
 	</Extension>
-	
+
 	<Extension path="/MonoDevelop/Core/StockIcons">
 		<StockIcon stockid="md-aspnet-empty-project" resource="project-aspnet-32.png" size="Dnd" />
 	</Extension>

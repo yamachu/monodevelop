@@ -330,7 +330,6 @@ src/addins/VersionControl/Subversion.Win32/Makefile
 src/addins/VersionControl/Makefile
 src/addins/CSharpBinding/Makefile
 src/addins/CSharpBinding/Autotools/Makefile
-src/addins/CSharpBinding/AspNet/Makefile
 src/addins/ILAsmBinding/Makefile
 src/addins/VBNetBinding/Makefile
 src/addins/ChangeLogAddIn/Makefile
